@@ -1,6 +1,9 @@
 package gloss
 
-import "os"
+import (
+	"os"
+	"testing"
+)
 
 // NOTE: A PostgreSQL instance must be running on db:5432 with
 // the below environment configuration for these tests to work
@@ -27,4 +30,41 @@ func setupDbTest() {
 
 	// create fresh tables
 	CreateTables()
+}
+
+// getCounterVal gets a value from the counter, or fails the test
+func getCounterVal(counterId int, t *testing.T) int {
+	query := `SELECT val FROM counter WHERE counter_id = $1`
+
+	var val int
+	if err := db.QueryRow(query, counterId).Scan(&val); err != nil {
+		t.Fatal(err)
+	}
+
+	return val
+}
+
+func TestIncrementCounter(t *testing.T) {
+	setupDbTest()
+	counterId := 0
+
+	// expect first insert to zero init counter
+	if err := IncrementCounter(0); err != nil {
+		t.Fatal(err)
+	}
+
+	got := getCounterVal(counterId, t)
+	if got != 0 {
+		t.Fatalf("expected counter val: %v, got: %v", 0, got)
+	}
+
+	// expect an increment
+	if err := IncrementCounter(0); err != nil {
+		t.Fatal(err)
+	}
+
+	got = getCounterVal(counterId, t)
+	if got != 1 {
+		t.Fatalf("expected counter val: %v, got: %v", 1, got)
+	}
 }
