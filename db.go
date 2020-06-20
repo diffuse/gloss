@@ -64,10 +64,32 @@ func CreateTables() {
 	query := `
 	CREATE TABLE IF NOT EXISTS counter
 	(
+		counter_id INTEGER PRIMARY KEY,
 		val INTEGER NOT NULL
 	)`
 
 	if _, err := db.Exec(query); err != nil {
 		panic(err)
 	}
+}
+
+// IncrementCounter increments the value in the counter table
+func IncrementCounter(counterId int) error {
+	query := `
+	INSERT INTO counter(counter_id, val)
+	VALUES($1, 0)
+	ON CONFLICT(counter_id)
+	DO UPDATE
+	SET val = counter.val + 1`
+
+	_, err := db.Exec(query, counterId)
+	return err
+}
+
+// GetCounterVal gets the value of a counter with ID counterId
+func GetCounterVal(counterId int) (int, error) {
+	query := `SELECT val FROM counter WHERE counter_id = $1`
+
+	var val int
+	return val, db.QueryRow(query, counterId).Scan(&val)
 }
