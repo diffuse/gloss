@@ -68,3 +68,23 @@ func TestIncrementCounter(t *testing.T) {
 		t.Fatalf("expected counter val: %v, got: %v", 1, got)
 	}
 }
+
+func TestGetCounterVal(t *testing.T) {
+	// insert a value at counterId 8
+	counterId := 8
+	counterVal := 1234
+	query := `INSERT INTO counter(counter_id, val) VALUES($1, $2)`
+	if _, err := db.Exec(query, counterId, counterVal); err != nil {
+		t.Fatal(err)
+	}
+
+	// get the value
+	val, err := GetCounterVal(counterId)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if val != counterVal {
+		t.Errorf("expected counter val: %v, got: %v", counterVal, val)
+	}
+}

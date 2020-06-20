@@ -85,3 +85,11 @@ func IncrementCounter(counterId int) error {
 	_, err := db.Exec(query, counterId)
 	return err
 }
+
+// GetCounterVal gets the value of a counter with ID counterId
+func GetCounterVal(counterId int) (int, error) {
+	query := `SELECT val FROM counter WHERE counter_id = $1`
+
+	var val int
+	return val, db.QueryRow(query, counterId).Scan(&val)
+}
