@@ -70,9 +70,11 @@ func TestIncrementCounter(t *testing.T) {
 }
 
 func TestGetCounterVal(t *testing.T) {
-	// insert a value at counterId 8
+	setupDbTest()
 	counterId := 8
 	counterVal := 1234
+
+	// insert a value at counterId 8
 	query := `INSERT INTO counter(counter_id, val) VALUES($1, $2)`
 	if _, err := db.Exec(query, counterId, counterVal); err != nil {
 		t.Fatal(err)
