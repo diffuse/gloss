@@ -87,3 +87,6 @@ things you may want to consider:
 - Use SSL for communication with the database
 - Choose routing middleware to fit your needs
 - Properly manage credentials used/shared by the microservice and database
+
+### License
+This project is licensed under the terms of the [MIT license](LICENSE).
