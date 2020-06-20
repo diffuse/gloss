@@ -10,6 +10,10 @@ import (
 )
 
 func main() {
+	// init db
+	gloss.InitDb()
+	defer gloss.CloseDb()
+
 	// setup router
 	r := chi.NewRouter()
 
