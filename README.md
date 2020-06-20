@@ -40,6 +40,9 @@ go get -d ./...
 # install to ~/go/bin
 go install ./...
 
+# export the test environment variables
+while read l; do export $l; done < test.env
+
 # run the service (this binds to port 8080 and waits for requests)
 ~/go/bin/gloss
 ```
