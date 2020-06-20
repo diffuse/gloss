@@ -34,6 +34,7 @@ func GetCounterById(w http.ResponseWriter, r *http.Request) {
 	val, err := GetCounterVal(int(counterId))
 	if err != nil {
 		http.Error(w, "failed to get counter value", http.StatusInternalServerError)
+		return
 	}
 
 	if _, err := w.Write([]byte(strconv.Itoa(val))); err != nil {
