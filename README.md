@@ -73,10 +73,10 @@ psql -h localhost -p 5432 -U test -d test
 ```
 
 ### Adapting to your own implementation
-- Add your business-logic methods to the `gloss.Database` interface, then implement it in a custom package
-    - (e.g. the example counter `IncrementCounter` and `GetCounterVal` methods, implemented in the pgsql package)
-- Edit the pgsql package if you want to use PostgreSQL, or create your own subpackage with a different database,
-then implement the `gloss.Database` interface methods in this package
+- Add your business logic methods to the `gloss.Database` interface (found in `domain.go`, then implement it in a 
+custom package (e.g. the example counter `IncrementCounter` and `GetCounterVal` methods, implemented in the pgsql 
+package)
+    - You can also just edit the pgsql package and change the domain interface methods if you want to use PostgreSQL
 - Use your `gloss.Database` implementation by assigning an instance of your package's Database to the `Db` var in 
 `handlers.go`
 - Replace/change the example handler bodies in `handlers.go` to perform your business logic
