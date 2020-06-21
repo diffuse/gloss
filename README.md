@@ -3,7 +3,7 @@ gloss (Golang open simple service) provides boilerplate routing, database setup,
 microservice up and running.  It includes example code to increment and retrieve counter values from a PostgreSQL 
 database.  Ideally, one would fork, or clone + mirror push this repository, then edit the handlers + routes, database 
 queries, and configurations for their own purposes.  It uses [chi](https://github.com/go-chi/chi) for routing, and 
-[pq](https://github.com/lib/pq) for its PostgreSQL database driver.
+[pgx](https://github.com/jackc/pgx) for its PostgreSQL database driver.
 
 ### Prerequisites
 - [Docker](https://www.docker.com/)
@@ -73,9 +73,13 @@ psql -h localhost -p 5432 -U test -d test
 ```
 
 ### Adapting to your own implementation
-- Change the SQL query in `db.go:CreateTables` to use your custom schema
-- Replace/change example counter insert and select functions from `db.go` and `db_test.go` with your own
-- Replace/change example handlers in `handlers.go` with your own
+- Add your business logic methods to the `gloss.Database` interface (found in `domain.go`, then implement it in a 
+custom package (e.g. the example counter `IncrementCounter` and `GetCounterVal` methods, implemented in the pgsql 
+package)
+    - You can also just edit the pgsql package and change the domain interface methods if you want to use PostgreSQL
+- Use your `gloss.Database` implementation by assigning an instance of your package's Database to the `Db` var in 
+`handlers.go`
+- Replace/change the example handler bodies in `handlers.go` to perform your business logic
 - Update the routes in `routes.go` to use your handlers
 
 ### Disclaimer and considerations for deployment

@@ -1,35 +1,40 @@
-package gloss
+package pgsql
 
 import (
 	"os"
 	"testing"
 )
 
+var testDb *Database
+
 // NOTE: A PostgreSQL instance must be running on db:5432 with
 // the below environment configuration for these tests to work
 func init() {
 	// set environment vars
-	os.Setenv("POSTGRES_HOST", "db")
-	os.Setenv("POSTGRES_USER", "test")
-	os.Setenv("POSTGRES_PASS", "password")
-	os.Setenv("POSTGRES_DBNAME", "test")
-	os.Setenv("POSTGRES_PORT", "5432")
-	os.Setenv("POSTGRES_SSL_MODE", "disable")
+	os.Setenv("PGHOST", "db")
+	os.Setenv("PGUSER", "test")
+	os.Setenv("PGPASSWORD", "password")
+	os.Setenv("PGDATABASE", "test")
+	os.Setenv("PGPORT", "5432")
+	os.Setenv("PGSSLMODE", "disable")
 
-	// init db
-	InitDb()
-}
+	// create and init db
+	testDb = NewDatabase()
 
-// setupDbTest drops the table counter if it exists and
-// creates new, fresh tables for the test to run with
-func setupDbTest() {
-	// drop the table if it exists
-	if _, err := db.Exec("DROP TABLE IF EXISTS counter"); err != nil {
+	// drop and recreate tables so tests have a known starting point
+	if _, err := testDb.db.Exec("DROP TABLE IF EXISTS counter"); err != nil {
 		panic(err)
 	}
+	testDb.createTables()
+}
 
-	// create fresh tables
-	CreateTables()
+// setupDbTest deletes all rows in the test tables, so each test
+// has a known starting point
+func setupDbTest() {
+	// delete all rows
+	if _, err := testDb.db.Exec("DELETE FROM counter"); err != nil {
+		panic(err)
+	}
 }
 
 // getCounterVal gets a value from the counter, or fails the test
@@ -37,7 +42,7 @@ func getCounterVal(counterId int, t *testing.T) int {
 	query := `SELECT val FROM counter WHERE counter_id = $1`
 
 	var val int
-	if err := db.QueryRow(query, counterId).Scan(&val); err != nil {
+	if err := testDb.db.QueryRow(query, counterId).Scan(&val); err != nil {
 		t.Fatal(err)
 	}
 
@@ -49,7 +54,7 @@ func TestIncrementCounter(t *testing.T) {
 	counterId := 0
 
 	// expect first insert to zero init counter
-	if err := IncrementCounter(0); err != nil {
+	if err := testDb.IncrementCounter(0); err != nil {
 		t.Fatal(err)
 	}
 
@@ -59,7 +64,7 @@ func TestIncrementCounter(t *testing.T) {
 	}
 
 	// expect an increment
-	if err := IncrementCounter(0); err != nil {
+	if err := testDb.IncrementCounter(0); err != nil {
 		t.Fatal(err)
 	}
 
@@ -76,12 +81,12 @@ func TestGetCounterVal(t *testing.T) {
 
 	// insert a value at counterId 8
 	query := `INSERT INTO counter(counter_id, val) VALUES($1, $2)`
-	if _, err := db.Exec(query, counterId, counterVal); err != nil {
+	if _, err := testDb.db.Exec(query, counterId, counterVal); err != nil {
 		t.Fatal(err)
 	}
 
 	// get the value
-	val, err := GetCounterVal(counterId)
+	val, err := testDb.GetCounterVal(counterId)
 	if err != nil {
 		t.Fatal(err)
 	}
