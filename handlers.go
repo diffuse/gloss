@@ -41,7 +41,7 @@ func GetCounterById(w http.ResponseWriter, r *http.Request) {
 	// get value and return to requester
 	val, err := Db.GetCounterVal(int(counterId))
 	if err != nil {
-		http.Error(w, "failed to get counter value", http.StatusInternalServerError)
+		http.Error(w, "failed to get counter value", http.StatusNotFound)
 		return
 	}
 
