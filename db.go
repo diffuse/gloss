@@ -22,14 +22,14 @@ var (
 // tables this service relies on if they don't already exist
 func InitDb() {
 	// get connection info from environment
-	host = os.Getenv("POSTGRES_HOST")
-	user = os.Getenv("POSTGRES_USER")
-	password = os.Getenv("POSTGRES_PASS")
-	dbname = os.Getenv("POSTGRES_DBNAME")
-	sslMode = os.Getenv("POSTGRES_SSL_MODE")
+	host = os.Getenv("PGHOST")
+	user = os.Getenv("PGUSER")
+	password = os.Getenv("PGPASSWORD")
+	dbname = os.Getenv("PGDATABASE")
+	sslMode = os.Getenv("PGSSLMODE")
 
 	// parse the port
-	portVal, err := strconv.ParseUint(os.Getenv("POSTGRES_PORT"), 10, 16)
+	portVal, err := strconv.ParseUint(os.Getenv("PGPORT"), 10, 16)
 	if err != nil {
 		panic(err)
 	}

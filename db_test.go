@@ -9,12 +9,12 @@ import (
 // the below environment configuration for these tests to work
 func init() {
 	// set environment vars
-	os.Setenv("POSTGRES_HOST", "db")
-	os.Setenv("POSTGRES_USER", "test")
-	os.Setenv("POSTGRES_PASS", "password")
-	os.Setenv("POSTGRES_DBNAME", "test")
-	os.Setenv("POSTGRES_PORT", "5432")
-	os.Setenv("POSTGRES_SSL_MODE", "disable")
+	os.Setenv("PGHOST", "db")
+	os.Setenv("PGUSER", "test")
+	os.Setenv("PGPASSWORD", "password")
+	os.Setenv("PGDATABASE", "test")
+	os.Setenv("PGPORT", "5432")
+	os.Setenv("PGSSLMODE", "disable")
 
 	// init db
 	InitDb()
