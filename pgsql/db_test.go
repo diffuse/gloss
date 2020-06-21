@@ -20,18 +20,21 @@ func init() {
 
 	// create and init db
 	testDb = NewDatabase()
-}
 
-// setupDbTest drops the table counter if it exists and
-// creates new, fresh tables for the test to run with
-func setupDbTest() {
-	// drop the table if it exists
+	// drop and recreate tables so tests have a known starting point
 	if _, err := testDb.db.Exec("DROP TABLE IF EXISTS counter"); err != nil {
 		panic(err)
 	}
-
-	// create fresh tables
 	testDb.createTables()
+}
+
+// setupDbTest deletes all rows in the test tables, so each test
+// has a known starting point
+func setupDbTest() {
+	// delete all rows
+	if _, err := testDb.db.Exec("DELETE FROM counter"); err != nil {
+		panic(err)
+	}
 }
 
 // getCounterVal gets a value from the counter, or fails the test
