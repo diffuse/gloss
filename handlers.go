@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+// Db is the thread-safe database that will be used by the handlers
 var Db Database
 
 func init() {
