@@ -2,53 +2,26 @@ package gloss
 
 import (
 	"database/sql"
-	"fmt"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
-	"os"
-	"strconv"
 )
 
-var (
-	db       *sql.DB
-	host     string
-	port     uint16
-	user     string
-	password string
-	dbname   string
-	sslMode  string
-)
+var db *sql.DB
 
 // InitDb connects to a PostgreSQL instance and creates the
 // tables this service relies on if they don't already exist
 func InitDb() {
-	// get connection info from environment
-	host = os.Getenv("PGHOST")
-	user = os.Getenv("PGUSER")
-	password = os.Getenv("PGPASSWORD")
-	dbname = os.Getenv("PGDATABASE")
-	sslMode = os.Getenv("PGSSLMODE")
-
-	// parse the port
-	portVal, err := strconv.ParseUint(os.Getenv("PGPORT"), 10, 16)
-	if err != nil {
-		panic(err)
-	}
-	port = uint16(portVal)
-
-	// construct a connection string
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		host, port, user, password, dbname, sslMode)
-
-	// open connection to the database
-	db, err = sql.Open("postgres", connStr)
+	// connect to database using configuration created from environment variables
+	//
+	// from https://godoc.org/github.com/lib/pq
+	// "Most environment variables as specified at http://www.postgresql.org/docs/current/static/libpq-envars.html
+	// supported by libpq are also supported by pq."
+	connector, err := pq.NewConnector("")
 	if err != nil {
 		panic(err)
 	}
 
-	// check the connection
-	if err := db.Ping(); err != nil {
-		panic(err)
-	}
+	db = sql.OpenDB(connector)
 
 	// create tables
 	CreateTables()
