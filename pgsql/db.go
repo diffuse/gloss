@@ -1,18 +1,18 @@
 package pgsql
 
 import (
-	"database/sql"
-	_ "github.com/jackc/pgx"
-	"github.com/lib/pq"
+	"context"
+	"github.com/jackc/pgx"
 )
 
 type Database struct {
-	db *sql.DB
+	db *pgx.Conn
+	ctx context.Context
 }
 
 // NewDatabase creates and initializes a new Database
 func NewDatabase() *Database {
-	db := &Database{}
+	db := &Database{ctx: context.Background()}
 	db.Init()
 
 	return db
@@ -21,17 +21,16 @@ func NewDatabase() *Database {
 // Init connects to a PostgreSQL instance and creates the
 // tables this service relies on if they don't already exist
 func (d *Database) Init() {
-	// connect to database using configuration created from environment variables
-	//
-	// from https://godoc.org/github.com/lib/pq
-	// "Most environment variables as specified at http://www.postgresql.org/docs/current/static/libpq-envars.html
-	// supported by libpq are also supported by pq."
-	connector, err := pq.NewConnector("")
+	// read the PostgreSQL connection info from the environment
+	config, err := pgx.ParseConfig("")
 	if err != nil {
 		panic(err)
 	}
 
-	d.db = sql.OpenDB(connector)
+	// connect to database using configuration created from environment variables
+	if d.db, err = pgx.ConnectConfig(d.ctx, config); err != nil {
+		panic(err)
+	}
 
 	// create tables
 	d.createTables()
@@ -39,7 +38,7 @@ func (d *Database) Init() {
 
 // Close closes connections to the database
 func (d *Database) Close() error {
-	return d.Close()
+	return d.db.Close(d.ctx)
 }
 
 // createTables creates the tables that this service relies on
@@ -51,7 +50,7 @@ func (d *Database) createTables() {
 		val INTEGER NOT NULL
 	)`
 
-	if _, err := d.db.Exec(query); err != nil {
+	if _, err := d.db.Exec(d.ctx, query); err != nil {
 		panic(err)
 	}
 }
@@ -65,7 +64,7 @@ func (d *Database) IncrementCounter(counterId int) error {
 	DO UPDATE
 	SET val = counter.val + 1`
 
-	_, err := d.db.Exec(query, counterId)
+	_, err := d.db.Exec(d.ctx, query, counterId)
 	return err
 }
 
@@ -74,5 +73,5 @@ func (d *Database) GetCounterVal(counterId int) (int, error) {
 	query := `SELECT val FROM counter WHERE counter_id = $1`
 
 	var val int
-	return val, d.db.QueryRow(query, counterId).Scan(&val)
+	return val, d.db.QueryRow(d.ctx, query, counterId).Scan(&val)
 }

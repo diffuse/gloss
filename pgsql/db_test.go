@@ -1,11 +1,17 @@
 package pgsql
 
 import (
+	"context"
 	"os"
 	"testing"
 )
 
-var testDb *Database
+var (
+	testDb *Database
+
+	// testing context
+	ctx = context.Background()
+)
 
 // NOTE: A PostgreSQL instance must be running on db:5432 with
 // the below environment configuration for these tests to work
@@ -22,7 +28,7 @@ func init() {
 	testDb = NewDatabase()
 
 	// drop and recreate tables so tests have a known starting point
-	if _, err := testDb.db.Exec("DROP TABLE IF EXISTS counter"); err != nil {
+	if _, err := testDb.db.Exec(ctx, "DROP TABLE IF EXISTS counter"); err != nil {
 		panic(err)
 	}
 	testDb.createTables()
@@ -32,7 +38,7 @@ func init() {
 // has a known starting point
 func setupDbTest() {
 	// delete all rows
-	if _, err := testDb.db.Exec("DELETE FROM counter"); err != nil {
+	if _, err := testDb.db.Exec(ctx, "DELETE FROM counter"); err != nil {
 		panic(err)
 	}
 }
@@ -42,7 +48,7 @@ func getCounterVal(counterId int, t *testing.T) int {
 	query := `SELECT val FROM counter WHERE counter_id = $1`
 
 	var val int
-	if err := testDb.db.QueryRow(query, counterId).Scan(&val); err != nil {
+	if err := testDb.db.QueryRow(ctx, query, counterId).Scan(&val); err != nil {
 		t.Fatal(err)
 	}
 
@@ -81,7 +87,7 @@ func TestGetCounterVal(t *testing.T) {
 
 	// insert a value at counterId 8
 	query := `INSERT INTO counter(counter_id, val) VALUES($1, $2)`
-	if _, err := testDb.db.Exec(query, counterId, counterVal); err != nil {
+	if _, err := testDb.db.Exec(ctx, query, counterId, counterVal); err != nil {
 		t.Fatal(err)
 	}
 
