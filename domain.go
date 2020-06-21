@@ -4,7 +4,10 @@ package gloss
 //
 // additional methods can be added here, then implemented in sub-packages
 type Database interface {
+	// Init connects to the database, creates tables, etc...
 	Init()
+
+	// Close shuts down connections to the database
 	Close() error
 
 	// these are examples of business logic for the

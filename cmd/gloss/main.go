@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// close the db connections on exit
-	defer gloss.DB.Close()
+	defer gloss.Db.Close()
 
 	// setup router
 	r := chi.NewRouter()
