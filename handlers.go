@@ -7,10 +7,11 @@ import (
 	"strconv"
 )
 
-var DB Database
+// Db is the thread-safe database that will be used by the handlers
+var Db Database
 
 func init() {
-	DB = pgsql.NewDatabase()
+	Db = pgsql.NewDatabase()
 }
 
 // Increment the value of the counter with ID counterId
@@ -23,7 +24,7 @@ func IncrementCounterById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// increment in db
-	if err := DB.IncrementCounter(int(counterId)); err != nil {
+	if err := Db.IncrementCounter(int(counterId)); err != nil {
 		http.Error(w, "failed to increment counter value", http.StatusInternalServerError)
 	}
 }
@@ -38,9 +39,9 @@ func GetCounterById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get value and return to requester
-	val, err := DB.GetCounterVal(int(counterId))
+	val, err := Db.GetCounterVal(int(counterId))
 	if err != nil {
-		http.Error(w, "failed to get counter value", http.StatusInternalServerError)
+		http.Error(w, "failed to get counter value", http.StatusNotFound)
 		return
 	}
 

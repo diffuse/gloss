@@ -73,9 +73,13 @@ psql -h localhost -p 5432 -U test -d test
 ```
 
 ### Adapting to your own implementation
-- Change the SQL query in `db.go:CreateTables` to use your custom schema
-- Replace/change example counter insert and select functions from `db.go` and `db_test.go` with your own
-- Replace/change example handlers in `handlers.go` with your own
+- Add your business-logic methods to the `gloss.Database` interface, then implement it in a custom package
+    - (e.g. the example counter `IncrementCounter` and `GetCounterVal` methods, implemented in the pgsql package)
+- Edit the pgsql package if you want to use PostgreSQL, or create your own subpackage with a different database,
+then implement the `gloss.Database` interface methods in this package
+- Use your `gloss.Database` implementation by assigning an instance of your package's Database to the `Db` var in 
+`handlers.go`
+- Replace/change the example handler bodies in `handlers.go` to perform your business logic
 - Update the routes in `routes.go` to use your handlers
 
 ### Disclaimer and considerations for deployment
