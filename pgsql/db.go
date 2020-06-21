@@ -2,8 +2,8 @@ package pgsql
 
 import (
 	"database/sql"
+	_ "github.com/jackc/pgx"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 )
 
 type Database struct {
