@@ -1,8 +1,8 @@
 package gloss
 
-// Database represents a wrapper around a connection to a database
+// Database represents a wrapper around a database connection + driver
 //
-// additional methods can be added here, then implemented in sub-packages
+// additional methods can be added here, then implemented in custom packages
 type Database interface {
 	// Init connects to the database, creates tables, etc...
 	Init()
