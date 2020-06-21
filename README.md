@@ -3,7 +3,7 @@ gloss (Golang open simple service) provides boilerplate routing, database setup,
 microservice up and running.  It includes example code to increment and retrieve counter values from a PostgreSQL 
 database.  Ideally, one would fork, or clone + mirror push this repository, then edit the handlers + routes, database 
 queries, and configurations for their own purposes.  It uses [chi](https://github.com/go-chi/chi) for routing, and 
-[pq](https://github.com/lib/pq) for its PostgreSQL database driver.
+[pgx](https://github.com/jackc/pgx) for its PostgreSQL database driver.
 
 ### Prerequisites
 - [Docker](https://www.docker.com/)
