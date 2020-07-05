@@ -1,28 +1,20 @@
 package main
 
 import (
-	"github.com/diffuse/gloss"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/diffuse/gloss/chi"
+	"github.com/diffuse/gloss/pgsql"
 	"log"
 	"net/http"
 	"time"
 )
 
 func main() {
-	// close the db connections on exit
-	defer gloss.Db.Close()
+	// create a thread-safe database instance for use with the router
+	db := pgsql.NewDatabase()
+	defer db.Close()
 
-	// setup router
-	r := chi.NewRouter()
-
-	// set middleware
-	r.Use(
-		middleware.Logger,
-		middleware.Recoverer)
-
-	// mount routes on versioned path
-	r.Mount("/v1", gloss.GetRoutes())
+	// create a router and associate the database with it
+	r := chi.NewRouter(db)
 
 	// create server with some reasonable defaults
 	s := &http.Server{

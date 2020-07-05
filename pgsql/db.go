@@ -6,7 +6,7 @@ import (
 )
 
 type Database struct {
-	db *pgx.Conn
+	db  *pgx.Conn
 	ctx context.Context
 }
 
