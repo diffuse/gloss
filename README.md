@@ -3,7 +3,8 @@ gloss (Golang open simple service) provides boilerplate routing, database setup,
 microservice up and running.  It includes example code to increment and retrieve counter values from a PostgreSQL 
 database.  Ideally, one would fork, or clone + mirror push this repository, then edit the handlers + routes, database 
 queries, and configurations for their own purposes.  It uses [chi](https://github.com/go-chi/chi) for routing, and 
-[pgx](https://github.com/jackc/pgx) for its PostgreSQL database driver.
+[pgx](https://github.com/jackc/pgx) for its PostgreSQL database driver, but other databases or routers can be used
+by implementing the `Database` interface from `domain.go`, and/or the `Handler` interface from `net/http`.
 
 ### Prerequisites
 - [Docker](https://www.docker.com/)
@@ -73,14 +74,27 @@ psql -h localhost -p 5432 -U test -d test
 ```
 
 ### Adapting to your own implementation
-- Add your business logic methods to the `gloss.Database` interface (found in `domain.go`, then implement it in a 
-custom package (e.g. the example counter `IncrementCounter` and `GetCounterVal` methods, implemented in the pgsql 
-package)
-    - You can also just edit the pgsql package and change the domain interface methods if you want to use PostgreSQL
-- Use your `gloss.Database` implementation by assigning an instance of your package's Database to the `Db` var in 
-`handlers.go`
-- Replace/change the example handler bodies in `handlers.go` to perform your business logic
-- Update the routes in `routes.go` to use your handlers
+#### Database
+- Add your business logic methods to the `Database` interface (found in `domain.go`), then implement them in a 
+custom package 
+    - See the `IncrementCounter` and `GetCounterVal` methods for an example of this, implemented in the `pgsql` 
+package
+    - You can also just edit the `pgsql` package and change the domain interface methods if you want to continue using
+    PostgreSQL
+    
+#### Routing
+- Implement the `net/http` `Handler` interface, or edit the existing implementation in the `chi` package
+    - Replace/change the example handler bodies in `handlers.go` to perform your business logic
+    - Update the routes in `handlers.go`:`setupRoutes` to use your handlers
+
+#### Putting it all together
+- Pass an instance of your `Database` implementation to your custom `Handler`, and use the instance to perform 
+business logic in handler functions
+    - An example of this is shown in `cmd/gloss/main.go`, where `pgsql`'s `Database` implementation is used with `chi`'s
+    `Handler` implementation
+    - A `pgsql.Database` instance is created, then passed as a parameter to `chi.NewRouter`, which creates a router,
+    associates handler functions in the `chi` package with routes, then stores the `pgsql.Database` instance so it can 
+    be used in the custom handlers
 
 ### Disclaimer and considerations for deployment
 The deployment scripts, configurations, and any defaults included in this repository are not, under any circumstances, 

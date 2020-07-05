@@ -16,9 +16,8 @@ type Router struct {
 // NewRouter creates a router, associates a database
 // with it, and mounts API routes
 func NewRouter(db gloss.Database) *Router {
-	r := &Router{}
+	r := &Router{db: db}
 	r.setupRoutes()
-	r.SetDb(db)
 
 	return r
 }
@@ -40,11 +39,6 @@ func (rt *Router) setupRoutes() {
 
 	// mount routes on versioned path
 	rt.Mux.Mount("/v1", routes)
-}
-
-// SetDb associates a gloss.Database with this router
-func (rt *Router) SetDb(db gloss.Database) {
-	rt.db = db
 }
 
 // Increment the value of the counter with ID counterId
